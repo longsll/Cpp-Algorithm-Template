@@ -1,0 +1,18 @@
+// fun(u)函数表示 a%b<=u的
+long long fun(long long u)
+{
+    if(u < 0)
+        return 0;
+    long long res=0;
+    for(int i = 1; i <= b; ++i)
+    {
+        // b取1到u+1之间时，任何a模b都小于等于u，故加上a的值(即总数)
+        if(i <= u + 1)
+            res += a;
+        // b取大于u+1时，a以i个为一组，共(a/i)组，每组前u个值+取值为i的这个值(i%i=0)符合条件，(a / i) * (u + 1)
+        // 最后不满一组的，将余数在u里的数加上 min(a % i, u)
+        else
+            res += (a / i) * (u + 1) + min(a % i, u);
+    }
+    return res;
+} 

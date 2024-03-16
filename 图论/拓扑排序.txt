@@ -1,0 +1,18 @@
+//入度
+int d[N]
+void topsort() {
+    queue<int> q;
+    //ans为其拓扑序 ， top为点的个数
+    int ans[N], top = 0;
+    for (int i = 1; i <= n; i++)
+        if (d[i] == 0) q.push(i), ans[++top] = i;
+    while (q.size()) {
+        int t = q.front(); q.pop();
+        for (int i = h[t]; ~i ; i = ne[i]) {
+            int j = e[i];
+            if (--d[j] == 0) q.push(j), ans[++top] = j;
+        }
+    }
+    if (top != n) puts("-1");
+    else for (int i = 1; i <= n; i++) printf("%d ", ans[i]);
+}

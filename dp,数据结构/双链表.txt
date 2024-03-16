@@ -1,0 +1,55 @@
+//https://ac.nowcoder.com/acm/contest/74362/D
+
+#include <bits/stdc++.h>
+
+using namespace std;
+
+map<int,int> l , r;//l[i]为i的左节点 ， r[i]为i的右节点
+
+int main()
+{
+    int n;
+    cin >> n;
+    int start = -1e9-1 , end = 1e9+1;
+    r[start] = end;
+    l[end] = start;
+    while(n --){
+        int op;
+        cin >> op;
+        if(op == 1){
+            int a , b;
+            cin >> a >> b;
+            int ll , rr; // a插在ll , rr之间
+            if(b == 0){
+                ll = start;
+                rr = r[start];
+            }else{
+                ll = b;
+                rr = r[b];
+            }
+            r[ll] = a;
+            r[a] = rr;
+            l[a] = ll;
+            l[rr] = a;
+        }else{
+            int t;
+            cin >> t;
+            int ll = l[t] , rr = r[t];
+            r[ll] = rr;
+            l[rr] = ll;
+        }
+    }
+    int u = start , cnt = 0;
+    while(r[u] != end){
+        cnt ++;
+        u = r[u];
+    }
+    u = start;
+    cout << cnt << endl;
+    while(r[u] != end){
+        cout << r[u] << " ";
+        u = r[u];
+    }
+    
+    return 0;
+}

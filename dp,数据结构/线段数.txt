@@ -1,0 +1,89 @@
+#include <cstdio>
+#include <cstring>
+#include <iostream>
+#include <algorithm>
+
+using namespace std;
+
+typedef long long LL;
+
+const int N = 200010;
+
+//线段树节点
+//节点u:左子节点u * 2,右子节点u * 2 + 1
+int m, p;
+struct Node
+{
+    int l, r;//l,r区间
+    int v;  // 区间[l, r]中的最大值
+}tr[N * 4];
+
+//u:节点编号
+void pushup(int u)  // 更新当前节点：由子节点的信息，来计算父节点的信息
+{
+    tr[u].v = max(tr[u << 1].v, tr[u << 1 | 1].v);
+}
+
+//建树
+//u为1，根节点，整棵树的区间。l,r为左右范围
+void build(int u, int l, int r)
+{
+    tr[u] = {l, r};
+    if (l == r) return;//到达叶子节点
+    int mid = (l + r) / 2;
+    build(u*2, l, mid), build(u*2+1, mid + 1, r);//向下构造左右两边
+    pushup(u);//更新回父节点
+}
+
+//查询区间
+//u=1即从根节点开始查询整棵树的区间内的l,r范围的目标。
+int query(int u, int l, int r)
+{
+    if (tr[u].l >= l && tr[u].r <= r) return tr[u].v; // 树中节点，已经被完全包含在[l, r]中了
+    int mid = (tr[u].l + tr[u].r) / 2;
+    int v = 0;
+    if (l <= mid) v = query(u*2, l, r);
+    if (r > mid) v = max(v, query(u*2+1, l, r));
+    return v;
+}
+
+//修改操作
+//u=1即从根节点开始修改整棵树的区间内的单点x的值改为v
+void modify(int u, int x, int v)
+{
+    if (tr[u].l == x && tr[u].r == x) tr[u].v = v;//到达x叶子节点
+    else
+    {
+        int mid = (tr[u].l + tr[u].r)/2;
+        if (x <= mid) modify(u*2, x, v);//x在它的左子节点
+        else modify(u*2+1, x, v);//x在它的右子节点
+        pushup(u);//更新回父节点
+    }
+}
+
+
+int main()
+{
+    int n = 0, last = 0;
+    scanf("%d%d", &m, &p);
+    build(1, 1, m);
+
+    int x;
+    char op[2];
+    while (m -- )
+    {
+        scanf("%s%d", op, &x);
+        if (*op == 'Q')
+        {
+            last = query(1, n - x + 1, n);
+            printf("%d\n", last);
+        }
+        else
+        {
+            modify(1, n + 1, ((LL)last + x) % p);
+            n ++ ;
+        }
+    }
+
+    return 0;
+}

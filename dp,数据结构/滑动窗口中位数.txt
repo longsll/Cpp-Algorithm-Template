@@ -1,0 +1,69 @@
+// 两个 multiset 维护滑动窗口中的前 K 小值
+struct Magic {
+    int K;
+    // st1 保存前 K 小值，st2 保存其它值
+    multiset<long long> st1, st2;
+    // sm 表示 st1 中所有数的和
+    long long sm;
+
+    Magic(int K): K(K), sm(0) {}
+
+    // 调整 st1 和 st2 的大小，保证调整后 st1 保存前 K 小值
+    void adjust() {
+        while (st1.size() < K && st2.size() > 0) {
+            long long t = *(st2.begin());
+            st1.insert(t);
+            sm += t;
+            st2.erase(st2.begin());
+        }
+        while (st1.size() > K) {
+            long long t = *prev(st1.end());
+            st2.insert(t);
+            st1.erase(prev(st1.end()));
+            sm -= t;
+        }
+    }
+
+    // 插入元素 x
+    void add(long long x) {
+        if (!st2.empty() && x >= *(st2.begin())) st2.insert(x);
+        else st1.insert(x), sm += x;
+        adjust();
+    }
+
+    // 删除元素 x
+    void del(long long x) {
+        auto it = st1.find(x);
+        if (it != st1.end()) st1.erase(it), sm -= x;
+        else st2.erase(st2.find(x));
+        adjust();
+    }
+};
+class Solution {
+public:
+    vector<double> medianSlidingWindow(vector<int>& nums, int k) {
+        // 定义的大小为滑动窗口的一半
+        Magic magic(k / 2);
+        int n = nums.size();
+        vector<double> ans;
+        for(int i  = 0 ; i < k ; i ++){
+            magic.add(nums[i]);
+        }
+        
+        //依据滑窗的奇偶性判断中位数
+        if(k  % 2 == 0)ans.push_back(((double)*prev(magic.st1.end()) + *magic.st2.begin()) / 2);
+        else ans.push_back((double)*magic.st2.begin());
+
+        for(int i = k ; i < n ; i ++){
+            magic.del(nums[i - k]);
+            magic.add(nums[i]);
+            if(k  % 2 == 0)ans.push_back(((double)*prev(magic.st1.end()) + *magic.st2.begin()) / 2);
+            else ans.push_back((double)*magic.st2.begin());
+        }
+        return ans;
+    }
+};
+
+https://leetcode.cn/problems/sliding-window-median/description/
+https://leetcode.cn/problems/divide-an-array-into-subarrays-with-minimum-cost-ii/description/
+https://ac.nowcoder.com/acm/contest/73422/D

@@ -1,0 +1,36 @@
+//字符串最小表示
+//b为字符串,m为b长度
+string get_min(string b, int m)
+{
+    char a[N];
+    for (int i = 0; i < 2 * m; i++)
+        a[i] = b[i % m];
+
+    int i = 0, j = 1, k;
+    while (i < m && j < m)
+    {
+        for (k = 0; k < m && a[i + k] == a[j + k]; k++)
+            ;
+        if (k == m)
+            break;
+
+        if (a[i + k] > a[j + k])
+        {
+            i += k + 1;
+            if (i == j)
+                i++;
+        }
+        else
+        {
+            j += k + 1;
+            if (i == j)
+                j++;
+        }
+    }
+
+    k = min(i, j);
+
+    for (i = 0; i < m; i++)
+        b[i] = a[i + k];
+    return b;
+}
