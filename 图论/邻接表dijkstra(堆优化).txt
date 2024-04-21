@@ -1,31 +1,32 @@
-int dijkstra()
-{
-    memset(dist, 0x3f, sizeof dist);
-    dist[1] = 0;
-    priority_queue<PII, vector<PII>, greater<PII>> heap;
-    heap.push({0, 1});
+vector<vector<int>>& edges
+int m = edges.size();
 
-    while (heap.size())
-    {
-        auto t = heap.top();
-        heap.pop();
+vector<int> e[n], v[n];
+for (auto &edge : edges) {
+    e[edge[0]].push_back(edge[1]); v[edge[0]].push_back(edge[2]);
+    e[edge[1]].push_back(edge[0]); v[edge[1]].push_back(edge[2]);
+}
 
-        int  distance = t.first , ver = t.second,;
-
-        if (st[ver]) continue;
-        st[ver] = true;
-
-        for (int i = h[ver]; i != -1; i = ne[i])
-        {
-            int j = e[i];
-            if (dist[j] > dist[ver] + w[i])
-            {
-                dist[j] = dist[ver] + w[i];
-                heap.push({dist[j], j});
-            }
+// 求从 S 出发的最短路，答案保存在 dis 里
+auto dijkstra = [&](int S, long long *dis) {
+    memset(dis, -1, sizeof(long long) * n);
+    typedef pair<long long, int> pii;
+    priority_queue<pii, vector<pii>, greater<pii>> pq;
+    pq.push({0, S});
+    while (!pq.empty()) {
+        pii p = pq.top(); pq.pop();
+        int sn = p.second;
+        if (dis[sn] >= 0) continue;
+        dis[sn] = p.first;
+        for (int i = 0; i < e[sn].size(); i++) {
+            int fn = e[sn][i];
+            if (dis[fn] >= 0) continue;
+            pq.push({dis[sn] + v[sn][i], fn});
         }
     }
+};
 
-    if (dist[n] == 0x3f3f3f3f) return -1;
-    return dist[n];
-}
+// dis1：从 0 出发的最短路
+// dis2：从 n - 1 出发的最短路
+long long dis1[n], dis2[n];
+dijkstra(0, dis1); dijkstra(n - 1, dis2);
